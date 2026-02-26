@@ -38,15 +38,6 @@
             letter-spacing: 4px;
             word-break: keep-all;
         }
-        .subtitle {
-            text-align: center;
-            color: #ecdba8;
-            font-style: italic;
-            margin-top: -10px;
-            margin-bottom: 30px;
-            font-weight: 300;
-            text-shadow: 1px 1px 0 #3a2a1c;
-        }
         .board {
             background: #2d5a4b;
             border-radius: 60px 60px 40px 40px;
@@ -165,12 +156,6 @@
             color: #2d4a35;
             box-shadow: 0 5px 0 #8f6d3f;
         }
-        .detail-info {
-            font-size: 1.3rem;
-            color: #f0dbb0;
-            display: flex;
-            gap: 25px;
-        }
         .deal-btn {
             background: #f5c542;
             border: none;
@@ -191,12 +176,6 @@
         .deal-btn:active {
             transform: translateY(6px);
             box-shadow: 0 3px 0 #9e762b, 0 7px 12px black;
-        }
-        .footer-note {
-            text-align: center;
-            color: #b8a27b;
-            margin-top: 16px;
-            font-size: 0.95rem;
         }
         /* 发牌动画 */
         .card.dealing {
@@ -237,7 +216,6 @@
             .card { width: 60px; height: 85px; font-size: 1.1rem; }
             .hand-label h2 { font-size: 1.3rem; }
             .winner-box { font-size: 1.5rem; padding: 5px 20px; }
-            .detail-info { font-size: 1.1rem; gap: 15px; flex-wrap: wrap; }
             .deal-btn { font-size: 1.6rem; padding: 14px 30px; }
             .suit-big { font-size: 2rem; }
         }
@@ -256,7 +234,6 @@
                 width: 100%; /* 确保宽度100% */
             }
             h1 { font-size: 2rem; letter-spacing: 2px; margin-bottom: 8px; }
-            .subtitle { font-size: 0.9rem; margin-bottom: 20px; }
             .board { padding: 20px 12px 18px; border-radius: 40px 40px 28px 28px; }
             .hand-area { padding: 16px 8px 12px; margin-bottom: 20px; border-radius: 35px 35px 22px 22px; }
             .hand-label { margin-bottom: 10px; padding-left: 12px; }
@@ -275,9 +252,7 @@
             .suit-big { font-size: 1.6rem; }
             .result-area { padding: 15px 18px; margin: 12px 0 8px; border-radius: 40px; flex-direction: column; align-items: center; gap: 10px; }
             .winner-box { font-size: 1.3rem; padding: 4px 16px; width: 100%; text-align: center; }
-            .detail-info { font-size: 1rem; flex-direction: column; gap: 8px; text-align: center; }
             .deal-btn { font-size: 1.4rem; padding: 12px 24px; margin-top: 10px; letter-spacing: 2px; }
-            .footer-note { font-size: 0.8rem; margin-top: 12px; }
 
             /* 调整发牌动画起点距离 */
             .hand-area:not(.computer) .card.dealing,
@@ -290,7 +265,6 @@
             body { padding: 6px; }
             .game-container { padding: 12px 8px 16px; }
             h1 { font-size: 1.7rem; margin-bottom: 6px; letter-spacing: 1px; }
-            .subtitle { font-size: 0.8rem; margin-bottom: 15px; }
             .board { padding: 16px 8px 14px; }
             .hand-area { padding: 12px 5px 8px; margin-bottom: 15px; }
             .hand-label { margin-bottom: 8px; padding-left: 8px; }
@@ -309,9 +283,7 @@
             .suit-big { font-size: 1.2rem; }
             .result-area { padding: 12px 14px; margin: 10px 0 6px; }
             .winner-box { font-size: 1.1rem; padding: 3px 12px; }
-            .detail-info { font-size: 0.9rem; }
             .deal-btn { font-size: 1.1rem; padding: 9px 18px; margin-top: 8px; letter-spacing: 1px; }
-            .footer-note { font-size: 0.75rem; margin-top: 10px; }
 
             /* 进一步减小动画距离 */
             .hand-area:not(.computer) .card.dealing,
@@ -370,7 +342,6 @@
 <body>
 <div class="game-container">
     <h1>🃏 廣東牛牛</h1>
-    <div class="subtitle">三張湊十 · 鬥大小</div>
 
     <div class="board">
         <!-- 玩家区域 -->
@@ -406,12 +377,10 @@
         <!-- 结果栏 -->
         <div class="result-area" id="resultPanel">
             <div class="winner-box" id="winnerText">⚡ 发牌吧</div>
-            <div class="detail-info" id="detailText"></div>
         </div>
 
         <button class="deal-btn" id="dealBtn">🀄️ 发 牌</button>
     </div>
-    <div class="footer-note">A=1点 · J/Q/K=10点 · 五花牛＞炸弹＞五小牛＞牛牛＞有牛＞无牛</div>
 </div>
 
 <script>
@@ -620,7 +589,6 @@
         async function dealGame() {
             const dealBtn = document.getElementById('dealBtn');
             const winnerEl = document.getElementById('winnerText');
-            const detailEl = document.getElementById('detailText');
 
             // 禁用按钮，防止重复点击
             dealBtn.disabled = true;
@@ -628,7 +596,6 @@
 
             // 清空结果区域
             winnerEl.innerText = '🃏 发牌中...';
-            detailEl.innerText = '';
             document.getElementById('player-type').innerText = '等待发牌';
             document.getElementById('computer-type').innerText = '等待发牌';
 
@@ -694,7 +661,6 @@
 
             const result = compareHands(playerHand, computerHand);
             let winnerStr = '';
-            let detailStr = `玩家 ${playerScore.type}  vs  庄家 ${computerScore.type}`;
             if (result === 1) {
                 winnerStr = '🎉 玩家赢！';
             } else if (result === -1) {
@@ -703,7 +669,6 @@
                 winnerStr = '⚖️ 平局';
             }
             winnerEl.innerText = winnerStr;
-            detailEl.innerText = detailStr;
 
             // 恢复按钮
             dealBtn.disabled = false;
