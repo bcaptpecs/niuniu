@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>广东纸牌牛牛 · 网页版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #1e4b3c 0%, #2a6e5a 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .game-container {
+            max-width: 950px;
+            width: 100%;
+            background: #f1e8d9;
+            background-image: radial-gradient(circle at 20% 30%, #f8f0dd 2%, transparent 25%);
+            border-radius: 48px 48px 32px 32px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.6), inset 2px 2px 5px #fff3dd, inset -3px -3px 8px #b59e7a;
+            padding: 24px 20px 30px;
+            border: 2px solid #cbb086;
+        }
+        h1 {
+            text-align: center;
+            margin: 0 0 12px 0;
+            font-weight: 500;
+            color: #faeac9;
+            text-shadow: 2px 3px 0 #4a2e1e, 4px 5px 0 #00000022;
+            font-size: 2.6rem;
+            letter-spacing: 4px;
+            word-break: keep-all;
+        }
+        .subtitle {
+            text-align: center;
+            color: #ecdba8;
+            font-style: italic;
+            margin-top: -10px;
+            margin-bottom: 30px;
+            font-weight: 300;
+            text-shadow: 1px 1px 0 #3a2a1c;
+        }
+        .board {
+            background: #2d5a4b;
+            border-radius: 60px 60px 40px 40px;
+            padding: 30px 20px 25px;
+            box-shadow: inset 0 0 0 2px #8f7455, inset 0 0 15px #1e3a2e, 0 12px 10px rgba(0,0,0,0.3);
+        }
+        .hand-area {
+            background: #1b4235;
+            border-radius: 50px 50px 30px 30px;
+            padding: 24px 12px 18px;
+            margin-bottom: 30px;
+            box-shadow: inset 0 2px 8px #4f826b, inset 0 -3px 5px #0d2b20;
+        }
+        .hand-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding-left: 16px;
+        }
+        .hand-label h2 {
+            color: #fbe8b0;
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 400;
+            text-shadow: 1px 2px 0 #3b5f48;
+        }
+        .hand-type {
+            background: #2f2a1f;
+            color: #ffd78c;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 1.2rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            box-shadow: inset 0 1px 4px #bba477, 0 3px 0 #51442e;
+        }
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            padding: 8px 10px;
+            min-height: 130px;
+        }
+        .card {
+            background: #fcf9f2;
+            width: 85px;
+            height: 120px;
+            border-radius: 12px;
+            border: 2px solid #bfa37c;
+            box-shadow: 0 8px 0 #6e4f33, 0 10px 12px black;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px 5px;
+            font-weight: bold;
+            transition: transform 0.15s;
+            font-size: 1.5rem;
+            position: relative;
+        }
+        .card[data-suit="♠"] { color: #1f1f1f; }
+        .card[data-suit="♥"] { color: #c12b2b; }
+        .card[data-suit="♣"] { color: #1f1f1f; }
+        .card[data-suit="♦"] { color: #c12b2b; }
+        .card .top-left {
+            align-self: flex-start;
+            line-height: 1;
+        }
+        .card .bottom-right {
+            align-self: flex-end;
+            transform: rotate(180deg);
+            line-height: 1;
+        }
+        .card .suit-big {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3rem;
+            opacity: 0.25;
+            color: #4a3a28;
+        }
+        .computer .card {
+            background: #ecdbbd;
+            border-color: #9b7f60;
+        }
+        .result-area {
+            background: #3d2f1f;
+            border-radius: 60px;
+            padding: 20px 30px;
+            margin: 15px 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            border: 3px solid #b2925e;
+            box-shadow: inset 0 2px 5px #5f4d33;
+        }
+        .winner-box {
+            font-size: 2rem;
+            font-weight: 600;
+            background: #f3cf92;
+            padding: 8px 30px;
+            border-radius: 40px;
+            color: #2d4a35;
+            box-shadow: 0 5px 0 #8f6d3f;
+        }
+        .detail-info {
+            font-size: 1.3rem;
+            color: #f0dbb0;
+            display: flex;
+            gap: 25px;
+        }
+        .deal-btn {
+            background: #f5c542;
+            border: none;
+            font-size: 2rem;
+            padding: 16px 40px;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #2e4a3b;
+            box-shadow: 0 9px 0 #9e762b, 0 10px 20px black;
+            cursor: pointer;
+            transition: 0.05s linear;
+            margin-top: 15px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            letter-spacing: 3px;
+        }
+        .deal-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 3px 0 #9e762b, 0 7px 12px black;
+        }
+        .footer-note {
+            text-align: center;
+            color: #b8a27b;
+            margin-top: 16px;
+            font-size: 0.95rem;
+        }
+        /* 发牌动画 */
+        .card.dealing {
+            animation: dealCard 0.5s ease-out forwards;
+            opacity: 0;
+        }
+        /* 玩家牌从右侧飞入 */
+        .hand-area:not(.computer) .card.dealing {
+            transform: translateX(100px) translateY(-50px) rotate(10deg);
+        }
+        /* 庄家牌从右侧飞入 */
+        .hand-area.computer .card.dealing {
+            transform: translateX(100px) translateY(-50px) rotate(15deg);
+        }
+        @keyframes dealCard {
+            0% {
+                opacity: 0;
+            }
+            70% {
+                opacity: 1;
+                transform: translateX(0) translateY(5px) rotate(0);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) translateY(0) rotate(0);
+            }
+        }
+
+        @media (max-width: 650px) {
+            .card { width: 65px; height: 95px; font-size: 1.2rem; }
+            .hand-label h2 { font-size: 1.3rem; }
+            .winner-box { font-size: 1.5rem; padding: 5px 20px; }
+            .detail-info { font-size: 1.1rem; gap: 15px; flex-wrap: wrap; }
+            .deal-btn { font-size: 1.6rem; padding: 14px 30px; }
+            .suit-big { font-size: 2.2rem; }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 8px;
+                align-items: flex-start; /* 垂直方向顶部对齐 */
+                justify-content: center; /* 水平方向居中 */
+                min-height: 100vh; /* 确保至少占满屏幕 */
+            }
+            .game-container {
+                padding: 16px 12px 20px;
+                border-radius: 32px 32px 24px 24px;
+                max-width: 100%; /* 移除最大宽度限制 */
+                width: 100%; /* 确保宽度100% */
+            }
+            h1 { font-size: 2rem; letter-spacing: 2px; margin-bottom: 8px; }
+            .subtitle { font-size: 0.9rem; margin-bottom: 20px; }
+            .board { padding: 20px 12px 18px; border-radius: 40px 40px 28px 28px; }
+            .hand-area { padding: 16px 8px 12px; margin-bottom: 20px; border-radius: 35px 35px 22px 22px; }
+            .hand-label { margin-bottom: 10px; padding-left: 12px; }
+            .hand-label h2 { font-size: 1.1rem; }
+            .hand-type { font-size: 1rem; padding: 4px 12px; }
+            .cards { gap: 8px; padding: 6px 8px; min-height: 110px; }
+            .card { width: 55px; height: 80px; font-size: 1rem; }
+            .suit-big { font-size: 1.8rem; }
+            .result-area { padding: 15px 18px; margin: 12px 0 8px; border-radius: 40px; flex-direction: column; align-items: center; gap: 10px; }
+            .winner-box { font-size: 1.3rem; padding: 4px 16px; width: 100%; text-align: center; }
+            .detail-info { font-size: 1rem; flex-direction: column; gap: 8px; text-align: center; }
+            .deal-btn { font-size: 1.4rem; padding: 12px 24px; margin-top: 10px; letter-spacing: 2px; }
+            .footer-note { font-size: 0.8rem; margin-top: 12px; }
+
+            /* 调整发牌动画起点距离 */
+            .hand-area:not(.computer) .card.dealing,
+            .hand-area.computer .card.dealing {
+                transform: translateX(60px) translateY(-40px) rotate(10deg);
+            }
+        }
+
+        @media (max-width: 360px) {
+            body { padding: 6px; }
+            .game-container { padding: 12px 8px 16px; }
+            h1 { font-size: 1.7rem; margin-bottom: 6px; letter-spacing: 1px; }
+            .subtitle { font-size: 0.8rem; margin-bottom: 15px; }
+            .board { padding: 16px 8px 14px; }
+            .hand-area { padding: 12px 5px 8px; margin-bottom: 15px; }
+            .hand-label { margin-bottom: 8px; padding-left: 8px; }
+            .hand-label h2 { font-size: 1rem; }
+            .hand-type { font-size: 0.9rem; padding: 3px 10px; }
+            .cards { gap: 5px; padding: 5px 6px; min-height: 100px; }
+            .card { width: 48px; height: 65px; font-size: 0.85rem; }
+            .suit-big { font-size: 1.4rem; }
+            .result-area { padding: 12px 14px; margin: 10px 0 6px; }
+            .winner-box { font-size: 1.1rem; padding: 3px 12px; }
+            .detail-info { font-size: 0.9rem; }
+            .deal-btn { font-size: 1.1rem; padding: 9px 18px; margin-top: 8px; letter-spacing: 1px; }
+            .footer-note { font-size: 0.75rem; margin-top: 10px; }
+
+            /* 进一步减小动画距离 */
+            .hand-area:not(.computer) .card.dealing,
+            .hand-area.computer .card.dealing {
+                transform: translateX(40px) translateY(-30px) rotate(8deg);
+            }
+        }
+
+        /* 针对超小屏幕（如iPhone 5/SE） */
+        @media (max-width: 320px) {
+            .card { width: 45px; height: 60px; font-size: 0.8rem; }
+            .suit-big { font-size: 1.2rem; }
+            .hand-area { margin-bottom: 12px; }
+            h1 { font-size: 1.5rem; }
+            .deal-btn { font-size: 1rem; padding: 8px 16px; }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <h1>🃏 廣東牛牛</h1>
+    <div class="subtitle">三張湊十 · 鬥大小</div>
+
+    <div class="board">
+        <!-- 玩家区域 -->
+        <div class="hand-area">
+            <div class="hand-label">
+                <h2>👤 玩家</h2>
+                <span class="hand-type" id="player-type">等待发牌</span>
+            </div>
+            <div class="cards" id="player-cards">
+                <div class="card placeholder">?</div>
+                <div class="card placeholder">?</div>
+                <div class="card placeholder">?</div>
+                <div class="card placeholder">?</div>
+                <div class="card placeholder">?</div>
+            </div>
+        </div>
+
+        <!-- 电脑区域 -->
+        <div class="hand-area computer">
+            <div class="hand-label">
+                <h2>🤖 庄家</h2>
+                <span class="hand-type" id="computer-type">等待发牌</span>
+            </div>
+            <div class="cards" id="computer-cards">
+                <div class="card placeholder">?</div>
+                <div class="card placeholder">?</div>
+                <div class="card placeholder">?</div>
+                <div class="card placeholder">?</div>
+                <div class="card placeholder">?</div>
+            </div>
+        </div>
+
+        <!-- 结果栏 -->
+        <div class="result-area" id="resultPanel">
+            <div class="winner-box" id="winnerText">⚡ 发牌吧</div>
+            <div class="detail-info" id="detailText"></div>
+        </div>
+
+        <button class="deal-btn" id="dealBtn">🀄️ 发 牌</button>
+    </div>
+    <div class="footer-note">A=1点 · J/Q/K=10点 · 五花牛＞炸弹＞五小牛＞牛牛＞有牛＞无牛</div>
+</div>
+
+<script>
+    (function() {
+        // ---------- 牌库定义 ----------
+        const SUITS = ['♠', '♥', '♣', '♦'];          // 黑桃 > 红心 > 梅花 > 方块 (花色值 4,3,2,1)
+        const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+        // 点数 (用于计算10倍数) : A=1, 2~9=数值, 10,J,Q,K=10
+        function getPoint(rank) {
+            if (rank === 'A') return 1;
+            if (rank === 'J' || rank === 'Q' || rank === 'K') return 10;
+            return parseInt(rank, 10);
+        }
+        // 面值大小 (用于比大小) : A=1, 2=2 ... 10=10, J=11, Q=12, K=13
+        function getFaceValue(rank) {
+            if (rank === 'A') return 1;
+            if (rank === 'J') return 11;
+            if (rank === 'Q') return 12;
+            if (rank === 'K') return 13;
+            return parseInt(rank, 10);
+        }
+        // 花色数值
+        function suitValue(suit) {
+            return { '♠': 4, '♥': 3, '♣': 2, '♦': 1 }[suit];
+        }
+
+        // 创建一副新牌 (52张)
+        function createDeck() {
+            const deck = [];
+            for (let s of SUITS) {
+                for (let r of RANKS) {
+                    deck.push({
+                        suit: s,
+                        rank: r,
+                        point: getPoint(r),
+                        face: getFaceValue(r),
+                        suitVal: suitValue(s)
+                    });
+                }
+            }
+            return deck;
+        }
+
+        // Fisher–Yates 洗牌
+        function shuffle(deck) {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            return deck;
+        }
+
+        // ---------- 核心评估函数 ----------
+        // 输入: 5张牌的数组
+        // 输出: { type, level, compareInfo }   level越高越大，compareInfo为数字数组用于逐项比较
+        function evaluateHand(hand) {
+            // 深拷贝一份防止影响外部
+            const cards = [...hand];
+
+            // ---------- 1. 检查特殊牌型 ----------
+            // 五花牛: 五张牌 rank 都是 J/Q/K
+            const isWuhua = cards.every(c => c.rank === 'J' || c.rank === 'Q' || c.rank === 'K');
+            if (isWuhua) {
+                // 按面值降序, 然后展开面值+花色值
+                const sorted = [...cards].sort((a, b) => (b.face - a.face) || (b.suitVal - a.suitVal));
+                const compareInfo = [];
+                for (let c of sorted) {
+                    compareInfo.push(c.face, c.suitVal);
+                }
+                return { type: '五花牛', level: 7, compareInfo };
+            }
+
+            // 炸弹: 四张相同 face
+            const faceCount = new Map();
+            cards.forEach(c => faceCount.set(c.face, (faceCount.get(c.face) || 0) + 1));
+            let bombFace = null;
+            let singleCard = null;
+            for (let [face, cnt] of faceCount.entries()) {
+                if (cnt === 4) bombFace = face;
+                else if (cnt === 1) singleCard = cards.find(c => c.face === face);
+            }
+            if (bombFace !== null) {
+                // 四张相同 face，singleCard 是剩下的
+                // 比较信息: [炸弹面值, 单张面值, 单张花色值]
+                return {
+                    type: '炸弹',
+                    level: 6,
+                    compareInfo: [bombFace, singleCard.face, singleCard.suitVal]
+                };
+            }
+
+            // 五小牛: 所有牌 point ≤ 5 且 总point ≤ 10
+            const totalPoint = cards.reduce((acc, c) => acc + c.point, 0);
+            const allLe5 = cards.every(c => c.point <= 5);
+            if (allLe5 && totalPoint <= 10) {
+                // 按面值降序 (注意五小牛比较时总和小的胜, 所以用负总和作为第一优先级, 然后负的面值降序)
+                const sorted = [...cards].sort((a, b) => (b.face - a.face) || (b.suitVal - a.suitVal));
+                const compareInfo = [-totalPoint];  // 总和越小，负值越大，胜
+                for (let c of sorted) {
+                    compareInfo.push(-c.face, c.suitVal); // 注意用负face，因为希望小face胜
+                }
+                return { type: '五小牛', level: 5, compareInfo };
+            }
+
+            // ---------- 2. 寻找最佳牛 (非特殊牌型) ----------
+            // 遍历所有三张组合 C(5,3)=10
+            let bestNiu = -1;               // -1表示无牛, 0~9牛, 10为牛牛
+            let bestRemaining = null;        // 剩余两张牌 (按面值降序排列的数组, 每项保存 face 和 suitVal)
+
+            // 辅助: 比较两组剩余牌(已降序) 谁更大 (用于同牛数选更强组合)
+            function isRemainingBetter(remA, remB) {
+                for (let i = 0; i < 2; i++) {
+                    if (remA[i].face > remB[i].face) return true;
+                    if (remA[i].face < remB[i].face) return false;
+                    if (remA[i].suitVal > remB[i].suitVal) return true;
+                    if (remA[i].suitVal < remB[i].suitVal) return false;
+                }
+                return false; // 完全一样
+            }
+
+            const indices = [0,1,2,3,4];
+            // 枚举所有三张组合
+            for (let i = 0; i < indices.length; i++) {
+                for (let j = i+1; j < indices.length; j++) {
+                    for (let k = j+1; k < indices.length; k++) {
+                        const three = [cards[i], cards[j], cards[k]];
+                        const sumThree = three.reduce((acc, c) => acc + c.point, 0);
+                        if (sumThree % 10 !== 0) continue; // 必须凑成10/20/30
+
+                        // 剩余两张
+                        const remaining = cards.filter((_, idx) => idx !== i && idx !== j && idx !== k);
+                        const sumTwo = remaining.reduce((acc, c) => acc + c.point, 0);
+                        let niu = sumTwo % 10;
+                        if (niu === 0) niu = 10; // 牛牛
+
+                        // 将剩余两张按面值降序 (以便比较)
+                        const sortedRem = [...remaining].sort((a, b) => (b.face - a.face) || (b.suitVal - a.suitVal));
+
+                        if (niu > bestNiu) {
+                            bestNiu = niu;
+                            bestRemaining = sortedRem;
+                        } else if (niu === bestNiu && bestRemaining) {
+                            // 相同牛数，取剩余牌更大的组合
+                            if (isRemainingBetter(sortedRem, bestRemaining)) {
+                                bestRemaining = sortedRem;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 无牛情况
+            if (bestNiu === -1) {
+                const sortedAll = [...cards].sort((a, b) => (b.face - a.face) || (b.suitVal - a.suitVal));
+                const compareInfo = [];
+                for (let c of sortedAll) {
+                    compareInfo.push(c.face, c.suitVal);
+                }
+                return { type: '无牛', level: 2, compareInfo };
+            }
+
+            // 有牛: bestNiu 1~10 (10代表牛牛)
+            const typeStr = bestNiu === 10 ? '牛牛' : `牛${bestNiu}`;
+            const level = 3 + (bestNiu / 10); // 牛10=4, 牛9=3.9, 牛1=3.1
+            // compareInfo: 先放牛数(10~1), 再放剩余两张的face和suit (已降序)
+            const compareInfo = [bestNiu];
+            for (let c of bestRemaining) {
+                compareInfo.push(c.face, c.suitVal);
+            }
+            return { type: typeStr, level, compareInfo };
+        }
+
+        // 比较两手牌, 返回 1: handA赢, -1: handB赢, 0:平
+        function compareHands(handA, handB) {
+            const scoreA = evaluateHand(handA);
+            const scoreB = evaluateHand(handB);
+            if (scoreA.level > scoreB.level) return 1;
+            if (scoreA.level < scoreB.level) return -1;
+
+            // level相同 逐项比较compareInfo
+            for (let i = 0; i < Math.min(scoreA.compareInfo.length, scoreB.compareInfo.length); i++) {
+                if (scoreA.compareInfo[i] > scoreB.compareInfo[i]) return 1;
+                if (scoreA.compareInfo[i] < scoreB.compareInfo[i]) return -1;
+            }
+            return 0; // 完全相等
+        }
+
+        // ---------- 渲染手牌到DOM ----------
+        function renderCards(containerId, hand) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            hand.forEach(card => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card';
+                cardDiv.setAttribute('data-suit', card.suit);
+                cardDiv.innerHTML = `
+                    <div class="top-left">${card.rank}<br>${card.suit}</div>
+                    <div class="suit-big">${card.suit}</div>
+                    <div class="bottom-right">${card.suit}<br>${card.rank}</div>
+                `;
+                container.appendChild(cardDiv);
+            });
+        }
+
+        // 更新UI: 发牌并显示结果（带动画）
+        async function dealGame() {
+            const dealBtn = document.getElementById('dealBtn');
+            const winnerEl = document.getElementById('winnerText');
+            const detailEl = document.getElementById('detailText');
+
+            // 禁用按钮，防止重复点击
+            dealBtn.disabled = true;
+            dealBtn.style.opacity = '0.6';
+
+            // 清空结果区域
+            winnerEl.innerText = '🃏 发牌中...';
+            detailEl.innerText = '';
+            document.getElementById('player-type').innerText = '等待发牌';
+            document.getElementById('computer-type').innerText = '等待发牌';
+
+            // 清空牌桌
+            const playerContainer = document.getElementById('player-cards');
+            const computerContainer = document.getElementById('computer-cards');
+            playerContainer.innerHTML = '';
+            computerContainer.innerHTML = '';
+
+            // 创建并洗牌
+            const deck = shuffle(createDeck());
+            const playerHand = deck.slice(0, 5);
+            const computerHand = deck.slice(5, 10);
+
+            // 辅助函数：创建一张牌元素并添加到容器
+            function createCardElement(card) {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = 'card dealing';
+                cardDiv.setAttribute('data-suit', card.suit);
+                cardDiv.innerHTML = `
+                    <div class="top-left">${card.rank}<br>${card.suit}</div>
+                    <div class="suit-big">${card.suit}</div>
+                    <div class="bottom-right">${card.suit}<br>${card.rank}</div>
+                `;
+                return cardDiv;
+            }
+
+            // 交替发牌：玩家1 → 庄家1 → 玩家2 → 庄家2 ...
+            async function dealCardsOneByOne() {
+                for (let i = 0; i < 10; i++) {
+                    const isPlayerTurn = i % 2 === 0; // 偶数索引发玩家牌，奇数发庄家牌
+                    const cardIndex = Math.floor(i / 2); // 0,0,1,1,2,2,3,3,4,4
+
+                    if (isPlayerTurn) {
+                        // 发玩家牌
+                        const playerCard = playerHand[cardIndex];
+                        const playerCardEl = createCardElement(playerCard);
+                        playerContainer.appendChild(playerCardEl);
+                    } else {
+                        // 发庄家牌
+                        const computerCard = computerHand[cardIndex];
+                        const computerCardEl = createCardElement(computerCard);
+                        computerContainer.appendChild(computerCardEl);
+                    }
+
+                    // 每张牌间隔2000毫秒，加快一倍速度
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+
+            // 执行发牌
+            await dealCardsOneByOne();
+
+            // 等待动画完成（动画时长0.5秒，再等0.2秒）
+            await new Promise(resolve => setTimeout(resolve, 700));
+
+            // 评估双方
+            const playerScore = evaluateHand(playerHand);
+            const computerScore = evaluateHand(computerHand);
+
+            document.getElementById('player-type').innerText = playerScore.type;
+            document.getElementById('computer-type').innerText = computerScore.type;
+
+            const result = compareHands(playerHand, computerHand);
+            let winnerStr = '';
+            let detailStr = `玩家 ${playerScore.type}  vs  庄家 ${computerScore.type}`;
+            if (result === 1) {
+                winnerStr = '🎉 玩家赢！';
+            } else if (result === -1) {
+                winnerStr = '💻 庄家赢';
+            } else {
+                winnerStr = '⚖️ 平局';
+            }
+            winnerEl.innerText = winnerStr;
+            detailEl.innerText = detailStr;
+
+            // 恢复按钮
+            dealBtn.disabled = false;
+            dealBtn.style.opacity = '1';
+        }
+
+        // 绑定按钮事件
+        document.getElementById('dealBtn').addEventListener('click', () => {
+            dealGame();
+        });
+
+        // 初始化时自动发一次牌
+        window.addEventListener('load', () => {
+            dealGame();
+        });
+    })();
+</script>
+</body>
+</html>
